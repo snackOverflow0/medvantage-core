@@ -1,98 +1,157 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Medvantage Core — Multi-Tenant Clinical Workflow Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Medvantage Core is an enterprise-grade, multi-tenant clinical SaaS backend built with **NestJS**, **Prisma ORM**, **PostgreSQL**, and **Redis**. The architecture implements strict role-based access control, cryptographic identity isolation, and an asynchronous, event-driven performance metrics infrastructure.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## System Architecture Topology
 
-## Description
+The infrastructure segregates processing layers to ensure maximum uptime, high throughput, and structural isolation:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+  [ Client Layer ]      --> Postman / Frontend App
+         │
+         ▼
+  [ Guard Perimeter ]   --> Identity Verification (Passport JWT) & RBAC Authorization
+         │
+         ▼
+  [ Controller Layer ]  --> HTTP Ingress Parsing & Strict DTO Input Validation
+         │
+         ▼
+  [ Service Domain ]    --> Business Contracts & Atomic Transactional Logic
+         │
+         ▼
+  [ Persistence Layer ] --> Prisma Client communicating with PostgreSQL & Redis Cache Grid
 
-## Project setup
+Key Architectural Paradigms
+Multi-Tenant Data Isolation
 
-```bash
-$ npm install
-```
+Tenant onboarding and management via the Clinic space workspace model.
 
-## Compile and run the project
+1-to-1 Profile Extension Mapping Strategy: Generic identity User accounts are extended into specialized Doctor resource maps via rigid structural integrity constraints.
 
-```bash
-# development
-$ npm run start
+Cryptographic Identity Perimeter
 
-# watch mode
-$ npm run start:dev
+Password security handled using adaptive salt factors through bcrypt.
 
-# production mode
-$ npm run start:prod
-```
+Secure credential exchanges mint cryptographically signed stateless JWT Bearer Tokens.
 
-## Run tests
+Reflector-Driven Role-Based Access Control (RBAC)
 
-```bash
-# unit tests
-$ npm run test
+Custom @Roles() decorator metadata binding alongside an automated execution evaluation RolesGuard.
 
-# e2e tests
-$ npm run test:e2e
+Granular, case-sensitive endpoint access constraints (e.g., restricting doctor provisioning pipelines strictly to CLINIC_ADMIN).
 
-# test coverage
-$ npm run test:cov
-```
+Day 17 Advanced Event-Driven Paradigm
 
-## Deployment
+Decoupled Job Distribution: The core request-response lifecycle records transactional appointment data to PostgreSQL and fires an unblocking EventEmitter2 broadcast message before immediately responding to the client.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Asynchronous Background Processing: A background listener (AppointmentProcessor) intercepts the asynchronous event stream independently of the main threat pipeline.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+High-Performance Caching & In-Memory Analytics Engine
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+The background lifecycle stream uses Redis standalone nodes (ioredis) to process fast metrics evaluations (INCR operations).
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Sub-millisecond tracking capability for real-time analytics data grid visualization without causing lockouts on the database tier.
 
-## Resources
+Technological Stack Grid
+Framework: NestJS (TypeScript Node.js Enterprise Engine)
 
-Check out a few resources that may come in handy when working with NestJS:
+Data Layer ORM: Prisma Client Core
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Primary Database: PostgreSQL
 
-## Support
+Memory Cache & Event Grid: Redis Engine via ioredis
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Identity Management: Passport.js Ecosystem (passport-jwt)
 
-## Stay in touch
+Validation Layer: Class-Validator & Class-Transformer Pipes
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Local Deployment & Setup Guide
+1. Provision Environment Variable Files
+Create a .env deployment configuration file at the root node directory of the system workspace:
 
-## License
+Code snippet
+DATABASE_URL="postgresql://<USER>:<PASSWORD>@localhost:5432/<DATABASE_NAME>?schema=public"
+JWT_SECRET="MEDVANTAGE_ENTERPRISE_CORE_SECRET_KEY_2026"
+2. Install Development Framework Libraries
+Bash
+npm install
+3. Initialize and Sync Storage Structures
+Run migrations to lay down schemas across your local database instances:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Bash
+npx prisma migrate dev --name init_medvantage_core_database
+4. Boot Up Environment Caching Node Containers
+Make sure your local Redis server environment instance is currently operational:
+
+Bash
+redis-server
+5. Launch the Local Application Server
+Bash
+# Watch execution compiler mode
+npm run start:dev
+Comprehensive API Gateway Postman Integration Walkthrough
+Phase 1: Security Network Registry Setup
+Endpoint Path Location: POST /auth/register
+
+Network Payload Matrix:
+
+JSON
+{
+  "email": "executive.admin@medvantage.com",
+  "password": "secureClinicPassword2026",
+  "role": "CLINIC_ADMIN"
+}
+Phase 2: Credential Exchange Session Login
+Endpoint Path Location: POST /auth/login
+
+Network Payload Matrix:
+
+JSON
+{
+  "email": "executive.admin@medvantage.com",
+  "password": "secureClinicPassword2026"
+}
+Expected Response: Extracts a signed "accessToken" bearer string to place into authorization request properties.
+
+Phase 3: Provision Multi-Tenant Clinical Spaces
+Endpoint Path Location: POST /clinics
+
+Security Verification: Authorization: Bearer <ADMIN_ACCESS_TOKEN>
+
+Network Payload Matrix:
+
+JSON
+{
+  "name": "Medvantage Health Capital — QC Headquarters",
+  "address": "Katipunan Avenue, Quezon City"
+}
+Phase 4: Upgrade User Identity into Extended Doctor Profile Ledger
+Endpoint Path Location: POST /doctors/:userId/profile
+
+Security Verification: Authorization: Bearer <ADMIN_ACCESS_TOKEN>
+
+Network Payload Matrix:
+
+JSON
+{
+  "clinicId": "PASTE_CLINIC_UUID_HERE",
+  "specialty": "PEDIATRICS",
+  "licenseNo": "PRC-PEDI-88312"
+}
+Phase 5: Asynchronous Schedule Event-Driven Execution
+Endpoint Path Location: POST /appointment
+
+Security Verification: Authorization: Bearer <ANY_VALID_USER_TOKEN>
+
+Network Payload Matrix:
+
+JSON
+{
+  "clinicId": "PASTE_CLINIC_UUID_HERE",
+  "doctorId": "PASTE_DOCTOR_PROFILE_UUID_HERE",
+  "timeSlot": "2026-06-15T14:30:00.000Z"
+}
+System Trace Output Observation: Monitor your server shell terminal to verify live event intercepts and automatic Redis caching updates.
+
+Bash
+[EVENT INTERCEPTED]: Asynchronous workflow triggered for Appointment ID: <UUID>
+[REDIS CACHE ENGINE COMPLETED]: Incremented metrics pipeline counter key: metrics:clinic:<UUID>:total-bookings -> Current Live Stand: 1
