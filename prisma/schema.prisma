@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CLINIC_ADMIN
+  DOCTOR
+  PATIENT
+}
+
+model User {
+  id               String        @id @default(uuid())
+  email            String        @unique
+  password         String
+  role             UserRole      @default(PATIENT)
+  createdAt        DateTime      @default(now())
+  
+  // Relational mappings
+  patientRecords   Appointment[] @relation("PatientToAppointment")
+  doctorProfile    Doctor?       // Explicit 1-to-1 extension if actor is a DOCTOR
+}
+
+model Clinic {
+  id        String   @id @default(uuid())
+
+  name      String
+  address   String
+
+  createdAt DateTime @default(now())
+
+  doctors   Doctor[]
+}
+
+model Doctor {
+  id           String        @id @default(uuid())
+
+  userId       String        @unique
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  clinicId     String
+  clinic       Clinic        @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  specialty    String
+  licenseNo    String        @unique
+  
+  appointments Appointment[]
+}
+
+model Appointment {
+  id          String   @id @default(uuid())
+
+  clinicId    String
+
+  doctorId    String
+  doctor      Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  patientId   String
+  patient     User     @relation("PatientToAppointment", fields: [patientId], references: [id], onDelete: Cascade)
+
+  timeSlot    DateTime // Standardized ISO8601 tracking timestamps
+  status      String   // PENDING, CONFIRMED, COMPLETED, CANCELLED
+  
+  createdAt   DateTime @default(now())
+}
